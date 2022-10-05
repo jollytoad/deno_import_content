@@ -1,11 +1,20 @@
-import { importText } from "./mod.ts";
-import { assertStringIncludes, serve } from "./deps_test.ts";
+import { importText } from "../mod.ts";
+import { assertRejects, assertStringIncludes, serve } from "./deps_test.ts";
 
 Deno.env.set("DENO_AUTH_TOKENS", "token1@localhost");
 
-Deno.test("import local text content", async () => {
-  const content = await importText("./LICENSE");
-  assertStringIncludes(content, "Copyright");
+// NOTE: It's important that these tests are NOT in the same folder as the importText module
+// itself, otherwise we can't be sure that the relative import tests are correct.
+
+Deno.test("import resolved local text content", async () => {
+  const content = await importText(import.meta.resolve("./content.txt"));
+  assertStringIncludes(content, "Here I am!");
+});
+
+Deno.test("import relative specifier fails", async () => {
+  await assertRejects(() => {
+    return importText("./content.txt");
+  }, TypeError);
 });
 
 Deno.test("import remote text content", async () => {

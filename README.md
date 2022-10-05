@@ -1,5 +1,8 @@
 # deno_import_content
 
+[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https://deno.land/x/deno_cache/mod.ts)
+[![Build Status - Cirrus][]][Build status] [![Twitter handle][]][Twitter badge]
+
 Import arbitrary file content in Deno using module resolution algorithms.
 
 This includes resolving via an import map, authentication using
@@ -8,6 +11,13 @@ This includes resolving via an import map, authentication using
 The idea is that `importText()` should act as similar to dynamic `import()` as
 possible, but just returning the raw text content instead of an evaluated JS or
 TS module.
+
+Unfortunately it's not possible for `importText` to resolve a relative specifier
+against the calling module, so they will need to be pre-resolved using
+`import.meta.resolve()`. (See the example below, and the tests)
+
+If anyone knows how we could get around this, please raise an issue or better
+still, a PR.
 
 ## Permissions
 
@@ -18,15 +28,15 @@ those [docs](https://deno.land/x/deno_cache#permissions) for full details.
 ## Example
 
 ```ts
-import { importText } from "https://deno.land/x/deno_import_content/mod.ts";
+import { importText } from "https://deno.land/x/import_content/mod.ts";
 
 // Fetch the text content of a remote file
 const remoteReadme = await importText(
-  "https://deno.land/x/deno_import_content/README.md",
+  "https://deno.land/x/import_content/README.md",
 );
 
 // Fetch the text content of a local file
-const localReadme = await importText("./README.md");
+const localReadme = await importText(import.meta.resolve("./README.md"));
 
 // Fetch the text content of a file, relying on an import map to resolve to a valid URL
 const mappedReadme = await importText("bare/README.md");
