@@ -20,15 +20,20 @@ Deno.test("import remote text content resolved via import map", async () => {
   assertStringIncludes(content, "Deno Standard Modules");
 });
 
-Deno.test("import remote text content using token", async () => {
-  const [controller, url] = await startTestServer();
+Deno.test({
+  // NOTE: This is disabled until the bug in deno_cache AuthTokens is fixed
+  ignore: true,
+  name: "import remote text content using token",
+  async fn() {
+    const [controller, url] = await startTestServer();
 
-  try {
-    const content = await importText(`${url}/something`);
-    assertStringIncludes(content, "Bearer token1");
-  } finally {
-    controller.abort();
-  }
+    try {
+      const content = await importText(`${url}/something`);
+      assertStringIncludes(content, "Bearer token1");
+    } finally {
+      controller.abort();
+    }
+  },
 });
 
 async function startTestServer() {
