@@ -1,7 +1,6 @@
 # deno_import_content
 
-[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https://deno.land/x/deno_cache/mod.ts)
-[![Build Status - Cirrus][]][Build status] [![Twitter handle][]][Twitter badge]
+[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https://deno.land/x/import_content/mod.ts)
 
 Import arbitrary file content in Deno using module resolution algorithms.
 
