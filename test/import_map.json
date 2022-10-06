@@ -1,5 +1,5 @@
 {
   "imports": {
-    "$std/": "https://deno.land/std@0.158.0/"
+    "test/": "http://localhost:8910/"
   }
 }

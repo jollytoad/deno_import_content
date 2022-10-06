@@ -1,15 +1,20 @@
 import { importText } from "../mod.ts";
-import { assertRejects, assertStringIncludes } from "./deps.ts";
-import { HOSTNAME, PORT, withServer } from "./with_server.ts";
+import { assertEquals, assertRejects, randomString } from "./deps.ts";
+import { withServer } from "./with_server.ts";
 
-Deno.env.set("DENO_AUTH_TOKENS", `token1@${HOSTNAME}:${PORT}`);
+Deno.env.set(
+  "DENO_AUTH_TOKENS",
+  `token1@localhost:8911;user1:pw1@localhost:8912`,
+);
+
+const CONTENT = "Remote plain text content!\n";
 
 // NOTE: It's important that these tests are NOT in the same folder as the importText module
 // itself, otherwise we can't be sure that the relative import tests are correct.
 
 Deno.test("import resolved local text content", async () => {
   const content = await importText(import.meta.resolve("./content.txt"));
-  assertStringIncludes(content, "Here I am!");
+  assertEquals(content, "Local plain text content!\n");
 });
 
 Deno.test("import relative specifier fails", async () => {
@@ -18,26 +23,57 @@ Deno.test("import relative specifier fails", async () => {
   }, TypeError);
 });
 
-Deno.test("import remote text content", async () => {
-  const content = await importText(
-    "https://deno.land/std@0.158.0/README.md",
-  );
-  assertStringIncludes(content, "Deno Standard Modules");
-});
-
-Deno.test("import remote text content resolved via import map", async () => {
-  const content = await importText("$std/README.md");
-  assertStringIncludes(content, "Deno Standard Modules");
+Deno.test({
+  name: "import remote text content",
+  fn: withServer(
+    respondWithContent,
+    { hostname: "localhost", port: 8910 },
+    async (url) => {
+      const content = await importText(`${url}/${randomString()}`);
+      assertEquals(content, CONTENT);
+    },
+  ),
 });
 
 Deno.test({
-  // NOTE: This is disabled until the bug in deno_cache AuthTokens is fixed
-  name: "import remote text content using token",
-  fn: withServer(respondWithAuthorization, async (url) => {
-    const content = await importText(`${url}/something`);
-    assertStringIncludes(content, "Authorization: Bearer token1");
+  name: "import remote text content resolved via import map",
+  fn: withServer(
+    respondWithContent,
+    { hostname: "localhost", port: 8910 },
+    async () => {
+      const content = await importText(`test/${randomString()}`);
+      assertEquals(content, CONTENT);
+    },
+  ),
+});
+
+Deno.test({
+  name: "import remote text content using bearer token",
+  fn: withServer(respondWithAuthorization, {
+    hostname: "localhost",
+    port: 8911,
+  }, async (url) => {
+    const content = await importText(`${url}/${randomString()}`);
+    assertEquals(content, "Authorization: Bearer token1");
   }),
 });
+
+Deno.test({
+  name: "import remote text content using basic auth",
+  fn: withServer(respondWithAuthorization, {
+    hostname: "localhost",
+    port: 8912,
+  }, async (url) => {
+    const content = await importText(`${url}/${randomString()}`);
+    assertEquals(content, "Authorization: Basic dXNlcjE6cHcx");
+  }),
+});
+
+function respondWithContent() {
+  return new Response(CONTENT, {
+    status: 200,
+  });
+}
 
 function respondWithAuthorization(req: Request) {
   return new Response("Authorization: " + req.headers.get("Authorization"), {
