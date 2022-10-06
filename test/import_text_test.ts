@@ -1,7 +1,8 @@
 import { importText } from "../mod.ts";
-import { assertRejects, assertStringIncludes, serve } from "./deps_test.ts";
+import { assertRejects, assertStringIncludes } from "./deps.ts";
+import { HOSTNAME, PORT, withServer } from "./with_server.ts";
 
-Deno.env.set("DENO_AUTH_TOKENS", "token1@localhost");
+Deno.env.set("DENO_AUTH_TOKENS", `token1@${HOSTNAME}:${PORT}`);
 
 // NOTE: It's important that these tests are NOT in the same folder as the importText module
 // itself, otherwise we can't be sure that the relative import tests are correct.
@@ -31,37 +32,16 @@ Deno.test("import remote text content resolved via import map", async () => {
 
 Deno.test({
   // NOTE: This is disabled until the bug in deno_cache AuthTokens is fixed
-  ignore: true,
   name: "import remote text content using token",
-  async fn() {
-    const [controller, url] = await startTestServer();
-
-    try {
-      const content = await importText(`${url}/something`);
-      assertStringIncludes(content, "Bearer token1");
-    } finally {
-      controller.abort();
-    }
-  },
+  fn: withServer(respondWithAuthorization, async (url) => {
+    const content = await importText(`${url}/something`);
+    assertStringIncludes(content, "Bearer token1");
+  }),
 });
 
-async function startTestServer() {
-  const controller = new AbortController();
-
-  const url = await new Promise<string>((resolve) => {
-    serve((req) => {
-      console.log("req", req);
-      return new Response("TOKEN: " + req.headers.get("Authorization"), {
-        status: 200,
-      });
-    }, {
-      hostname: "localhost",
-      signal: controller.signal,
-      onListen: ({ hostname, port }) => {
-        resolve(`http://${hostname}:${port}`);
-      },
-    });
+function respondWithAuthorization(req: Request) {
+  console.log("req", req);
+  return new Response("Authorization: " + req.headers.get("Authorization"), {
+    status: 200,
   });
-
-  return [controller, url] as const;
 }
