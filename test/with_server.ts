@@ -10,19 +10,27 @@ export const withServer = (
 async (t: Deno.TestContext) => {
   const controller = new AbortController();
 
+  let caught: unknown;
+
   await serve(handler, {
     hostname: HOSTNAME,
     port: PORT,
     signal: controller.signal,
     onListen: ({ hostname, port }) => {
       const url = `http://${hostname}:${port}`;
-      setTimeout(() => {
+      queueMicrotask(async () => {
         try {
-          test(url, t);
+          await test(url, t);
+        } catch (e) {
+          caught = e;
         } finally {
           controller.abort();
         }
-      }, 1);
+      });
     },
   });
+
+  if (caught) {
+    throw caught;
+  }
 };

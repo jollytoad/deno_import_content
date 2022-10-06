@@ -35,12 +35,11 @@ Deno.test({
   name: "import remote text content using token",
   fn: withServer(respondWithAuthorization, async (url) => {
     const content = await importText(`${url}/something`);
-    assertStringIncludes(content, "Bearer token1");
+    assertStringIncludes(content, "Authorization: Bearer token1");
   }),
 });
 
 function respondWithAuthorization(req: Request) {
-  console.log("req", req);
   return new Response("Authorization: " + req.headers.get("Authorization"), {
     status: 200,
   });
