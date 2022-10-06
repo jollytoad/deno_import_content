@@ -7,14 +7,14 @@ Deno.env.set(
   `token1@localhost:8911;user1:pw1@localhost:8912`,
 );
 
-const CONTENT = "Remote plain text content!\n";
+const CONTENT = "Remote plain text content!";
 
 // NOTE: It's important that these tests are NOT in the same folder as the importText module
 // itself, otherwise we can't be sure that the relative import tests are correct.
 
 Deno.test("import resolved local text content", async () => {
   const content = await importText(import.meta.resolve("./content.txt"));
-  assertEquals(content, "Local plain text content!\n");
+  assertEquals(content, "Local plain text content!");
 });
 
 Deno.test("import relative specifier fails", async () => {
