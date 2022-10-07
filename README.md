@@ -46,3 +46,11 @@ const mappedReadme = await importText("bare/README.md");
 Authentication via `DENO_AUTH_TOKENS` currently doesn't work due to a bug in
 `deno_cache`. There is a [PR](https://github.com/denoland/deno_cache/pull/18) to
 fix this, currently awaiting review.
+
+There is also a bug in `deno_cache` that requires the `--allow-write` permission
+to be given. There is another
+[PR](https://github.com/denoland/deno_cache/pull/21) for this too.
+
+Until those issues are solved, this module will depend upon a patched fork of
+`deno_cache` imported directly from my own
+[repository](https://github.com/jollytoad/deno_cache/tree/fixes).

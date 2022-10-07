@@ -1,6 +1,6 @@
 import { DenoDir, FileFetcher } from "./deps.ts";
 
-let fileFetcher: FileFetcher;
+let fileFetcher: FileFetcher | undefined;
 
 /**
  * Import an arbitrary text file via a Deno module specifier, as similar to a dynamic `import()`
@@ -22,14 +22,22 @@ export async function importText(specifier: string): Promise<string> {
     );
   }
 
-  const resolved = import.meta.resolve(specifier);
-  const response = await fileFetcher.fetch(new URL(resolved));
+  const resolved = new URL(import.meta.resolve(specifier));
+  const response = await fileFetcher.fetch(resolved);
 
   if (response?.kind === "module") {
     return response.content;
   } else {
     throw new TypeError(`Module content not found "${specifier.toString()}".`);
   }
+}
+
+/**
+ * INTERNAL: For test usage only
+ * @deprecated
+ */
+export function __reset__() {
+  fileFetcher = undefined;
 }
 
 // TODO: Consider adding importBlob to support binary imports
