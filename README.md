@@ -1,6 +1,6 @@
 # deno_import_content
 
-[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https://deno.land/x/import_content/mod.ts)
+[![deno doc](https://doc.deno.land/badge.svg)](https://deno.land/x/import_content/mod.ts)
 
 Import arbitrary file content in Deno using module resolution algorithms.
 
@@ -24,6 +24,10 @@ This module makes use of [`deno_cache`](https://deno.land/x/deno_cache) to
 perform fetching, and therefore requires all permissions that it requires. See
 those [docs](https://deno.land/x/deno_cache#permissions) for full details.
 
+Although, `--allow-write` permission for the cache dir is optional. If it is
+granted, then remote content will be cached, otherwise it will be fetched every
+time if the content isn't already present in the cache.
+
 ## Example
 
 ```ts
@@ -41,16 +45,8 @@ const localReadme = await importText(import.meta.resolve("./README.md"));
 const mappedReadme = await importText("bare/README.md");
 ```
 
-## Known Bugs
+## Fixed Dependencies
 
-Authentication via `DENO_AUTH_TOKENS` currently doesn't work due to a bug in
-`deno_cache`. There is a [PR](https://github.com/denoland/deno_cache/pull/18) to
-fix this, currently awaiting review.
-
-There is also a bug in `deno_cache` that requires the `--allow-write` permission
-to be given. There is another
-[PR](https://github.com/denoland/deno_cache/pull/21) for this too.
-
-Until those issues are solved, this module will depend upon a patched fork of
-`deno_cache` imported directly from my own
-[repository](https://github.com/jollytoad/deno_cache/tree/fixes).
+Previous versions of this module depended on my patched version of `deno_cache`,
+due to bugs in that module. These have since been fixed, so this module now
+depends on the official [`deno_cache`](https://deno.land/x/deno_cache@0.6.1).

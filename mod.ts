@@ -13,7 +13,12 @@ let fileFetcher: FileFetcher | undefined;
 export async function importText(specifier: string): Promise<string> {
   if (!fileFetcher) {
     const denoDir = new DenoDir();
-    fileFetcher = new FileFetcher(denoDir.deps);
+    const writeGranted =
+      (await Deno.permissions.query({ name: "write", path: denoDir.root }))
+        .state === "granted";
+    fileFetcher = new FileFetcher(
+      denoDir.createHttpCache({ readOnly: !writeGranted }),
+    );
   }
 
   if (isRelative(specifier)) {

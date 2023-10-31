@@ -1,2 +1,2 @@
-export { DenoDir } from "https://raw.githubusercontent.com/jollytoad/deno_cache/fixes/deno_dir.ts";
-export { FileFetcher } from "https://raw.githubusercontent.com/jollytoad/deno_cache/fixes/file_fetcher.ts";
+export { DenoDir } from "https://deno.land/x/deno_cache@0.6.1/deno_dir.ts";
+export { FileFetcher } from "https://deno.land/x/deno_cache@0.6.1/file_fetcher.ts";

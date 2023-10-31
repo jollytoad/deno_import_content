@@ -1,5 +1,6 @@
 {
   "tasks": {
-    "test": "deno test --allow-read --allow-write --allow-net --allow-env --import-map=test/import_map.json"
+    "test": "deno test --allow-read --allow-write --allow-net --allow-env --import-map=test/import_map.json",
+    "check": "deno fmt && deno lint && deno check **/*.ts"
   }
 }

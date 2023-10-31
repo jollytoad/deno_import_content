@@ -1,9 +1,3 @@
-import {
-  type Handler,
-  serve,
-  type ServeInit,
-} from "https://deno.land/std@0.158.0/http/mod.ts";
-
 /**
  * Create a basic HTTP server to run a test against.
  *
@@ -13,8 +7,8 @@ import {
  * @returns a test function that can be passed directly to `Deno.test`
  */
 export const withServer = (
-  handler: Handler,
-  opts: Pick<ServeInit, "hostname" | "port">,
+  handler: Deno.ServeHandler,
+  opts: Pick<Deno.ServeOptions, "hostname" | "port">,
   test: (url: string, t: Deno.TestContext) => void | Promise<void>,
 ) =>
 async (t: Deno.TestContext) => {
@@ -22,7 +16,8 @@ async (t: Deno.TestContext) => {
 
   let caught: unknown;
 
-  await serve(handler, {
+  await Deno.serve({
+    handler,
     ...opts,
     signal: controller.signal,
     onListen: ({ hostname, port }) => {
@@ -36,7 +31,7 @@ async (t: Deno.TestContext) => {
         }
       });
     },
-  });
+  }).finished;
 
   if (caught) {
     throw caught;
