@@ -1,5 +1,6 @@
 import { __reset__, importText } from "../mod.ts";
-import { assertEquals, assertRejects, randomString } from "./deps.ts";
+import { assertEquals, assertRejects } from "@std/assert";
+import { ulid as randomString } from "@std/ulid";
 import { withServer } from "./with_server.ts";
 
 Deno.env.set(

@@ -1,6 +1,14 @@
 {
+  "name": "@jollytoad/import-content",
+  "version": "1.0.0",
+  "exports": "./mod.ts",
   "tasks": {
     "test": "deno test --allow-read --allow-write --allow-net --allow-env --import-map=test/import_map.json",
     "check": "deno fmt && deno lint && deno check **/*.ts"
+  },
+  "imports": {
+    "@deno/cache-dir": "jsr:@deno/cache-dir@0.8.0",
+    "@std/assert": "jsr:@std/assert@0.222.1",
+    "@std/ulid": "jsr:@std/ulid@0.222.1"
   }
 }

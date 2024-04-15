@@ -1,4 +1,4 @@
-import { DenoDir, FileFetcher } from "./deps.ts";
+import { DenoDir, FileFetcher } from "@deno/cache-dir";
 
 let fileFetcher: FileFetcher | undefined;
 
@@ -16,8 +16,8 @@ export async function importText(specifier: string): Promise<string> {
     const writeGranted =
       (await Deno.permissions.query({ name: "write", path: denoDir.root }))
         .state === "granted";
-    fileFetcher = new FileFetcher(
-      denoDir.createHttpCache({ readOnly: !writeGranted }),
+    fileFetcher = new FileFetcher(() =>
+      denoDir.createHttpCache({ readOnly: !writeGranted })
     );
   }
 
@@ -31,7 +31,9 @@ export async function importText(specifier: string): Promise<string> {
   const response = await fileFetcher.fetch(resolved);
 
   if (response?.kind === "module") {
-    return response.content;
+    return typeof response.content === "string"
+      ? response.content
+      : new TextDecoder().decode(response.content);
   } else {
     throw new TypeError(`Module content not found "${specifier.toString()}".`);
   }

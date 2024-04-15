@@ -1,6 +1,4 @@
-# deno_import_content
-
-[![deno doc](https://doc.deno.land/badge.svg)](https://deno.land/x/import_content/mod.ts)
+# Deno Import Content
 
 Import arbitrary file content in Deno using module resolution algorithms.
 
@@ -20,9 +18,8 @@ still, a PR.
 
 ## Permissions
 
-This module makes use of [`deno_cache`](https://deno.land/x/deno_cache) to
-perform fetching, and therefore requires all permissions that it requires. See
-those [docs](https://deno.land/x/deno_cache#permissions) for full details.
+This module makes use of [`@deno/cache-dir`](https://jsr.io/@deno/cache-dir) to
+perform fetching, and therefore requires all permissions that it requires.
 
 Although, `--allow-write` permission for the cache dir is optional. If it is
 granted, then remote content will be cached, otherwise it will be fetched every
@@ -31,7 +28,7 @@ time if the content isn't already present in the cache.
 ## Example
 
 ```ts
-import { importText } from "https://deno.land/x/import_content/mod.ts";
+import { importText } from "jsr:@jollytoad/import-content";
 
 // Fetch the text content of a remote file
 const remoteReadme = await importText(
@@ -45,8 +42,18 @@ const localReadme = await importText(import.meta.resolve("./README.md"));
 const mappedReadme = await importText("bare/README.md");
 ```
 
-## Fixed Dependencies
+## Planned Obsolescence
 
-Previous versions of this module depended on my patched version of `deno_cache`,
-due to bugs in that module. These have since been fixed, so this module now
-depends on the official [`deno_cache`](https://deno.land/x/deno_cache@0.6.1).
+Hopefully this entire package will become completely obsolete once Deno fully
+supports importing of arbitrary files via import attributes...
+
+```ts
+const remoteReadme = await import(
+  "https://deno.land/x/import_content/README.md",
+  { with: { type: "text" } }
+);
+
+const localReadme = await import("./README.md", { with: { type: "text" } });
+
+const mappedReadme = await import("bare/README.md", { with: { type: "text" } });
+```
