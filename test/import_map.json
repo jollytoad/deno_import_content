@@ -1,8 +1,0 @@
-{
-  "imports": {
-    "test/": "http://localhost:8910/",
-    "@std/assert": "jsr:@std/assert@0.222.1",
-    "@std/ulid": "jsr:@std/ulid@0.222.1",
-    "@deno/cache-dir": "jsr:@deno/cache-dir@0.8.0"
-  }
-}

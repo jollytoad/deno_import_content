@@ -1,3 +1,5 @@
+import { getServerUrl } from "@http/host-deno-local/server-url";
+
 /**
  * Create a basic HTTP server to run a test against.
  *
@@ -8,32 +10,19 @@
  */
 export const withServer = (
   handler: Deno.ServeHandler,
-  opts: Pick<Deno.ServeOptions, "hostname" | "port">,
+  opts: Pick<Deno.ServeOptions, "port">,
   test: (url: string, t: Deno.TestContext) => void | Promise<void>,
 ) =>
 async (t: Deno.TestContext) => {
-  const controller = new AbortController();
-
-  let caught: unknown;
-
-  await Deno.serve({
-    handler,
+  const server = Deno.serve({
     ...opts,
-    signal: controller.signal,
-    onListen: ({ hostname, port }) => {
-      queueMicrotask(async () => {
-        try {
-          await test(`http://${hostname}:${port}`, t);
-        } catch (e) {
-          caught = e;
-        } finally {
-          controller.abort();
-        }
-      });
-    },
-  }).finished;
+    handler,
+    hostname: "::",
+  });
 
-  if (caught) {
-    throw caught;
+  try {
+    await test(getServerUrl(server.addr.hostname, server.addr.port), t);
+  } finally {
+    await server.shutdown();
   }
 };

@@ -5,12 +5,12 @@ Import arbitrary file content in Deno using module resolution algorithms.
 This includes resolving via an import map, authentication using
 `DENO_AUTH_TOKENS`, and use of the Deno cache.
 
-The idea is that `importText()` should act as similar to dynamic `import()` as
-possible, but just returning the raw text content instead of an evaluated JS or
-TS module.
+The idea is that `importText()`/`importBlob()`/`importBinary()` should act as
+similar to dynamic `import()` as possible, but just returning the raw text or
+binary content instead of an evaluated JS or TS module.
 
-Unfortunately it's not possible for `importText` to resolve a relative specifier
-against the calling module, so they will need to be pre-resolved using
+Unfortunately it's not possible for these functions to resolve a relative
+specifier against the calling module, so they will need to be pre-resolved using
 `import.meta.resolve()`. (See the example below, and the tests)
 
 If anyone knows how we could get around this, please raise an issue or better
