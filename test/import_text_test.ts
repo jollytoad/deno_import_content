@@ -1,5 +1,7 @@
-import { __reset__, importText } from "../mod.ts";
-import { assertEquals, assertRejects, randomString } from "./deps.ts";
+import { importText } from "../import_text.ts";
+import { __reset__ } from "../file_fetcher.ts";
+import { assertEquals, assertRejects } from "@std/assert";
+import { ulid as randomString } from "@std/ulid";
 import { withServer } from "./with_server.ts";
 
 Deno.env.set(
@@ -29,7 +31,7 @@ Deno.test({
   name: "import remote text content",
   fn: withServer(
     respondWithContent,
-    { hostname: "localhost", port: 8910 },
+    { port: 8910 },
     async (url) => {
       __reset__();
       const content = await importText(`${url}/${randomString()}`);
@@ -48,7 +50,7 @@ Deno.test({
   },
   fn: withServer(
     respondWithContent,
-    { hostname: "localhost", port: 8910 },
+    { port: 8910 },
     async (url) => {
       __reset__();
       const content = await importText(`${url}/${randomString()}`);
@@ -61,10 +63,10 @@ Deno.test({
   name: "import remote text content resolved via import map",
   fn: withServer(
     respondWithContent,
-    { hostname: "localhost", port: 8910 },
+    { port: 8910 },
     async () => {
       __reset__();
-      const content = await importText(`test/${randomString()}`);
+      const content = await importText(`$test/${randomString()}`);
       assertEquals(content, CONTENT);
     },
   ),
@@ -73,7 +75,6 @@ Deno.test({
 Deno.test({
   name: "import remote text content using bearer token",
   fn: withServer(respondWithAuthorization, {
-    hostname: "localhost",
     port: 8911,
   }, async (url) => {
     __reset__();
@@ -85,7 +86,6 @@ Deno.test({
 Deno.test({
   name: "import remote text content using basic auth",
   fn: withServer(respondWithAuthorization, {
-    hostname: "localhost",
     port: 8912,
   }, async (url) => {
     __reset__();
