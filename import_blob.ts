@@ -9,5 +9,7 @@ import { fetchFile } from "./file_fetcher.ts";
  * @returns The content of the file as a Blob.
  */
 export async function importBlob(specifier: string): Promise<Blob> {
-  return new Blob([await fetchFile(specifier)]);
+  const content = await fetchFile(specifier);
+
+  return new Blob([content]);
 }

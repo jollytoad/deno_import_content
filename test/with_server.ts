@@ -10,7 +10,7 @@ import { getServerUrl } from "@http/host-deno-local/server-url";
  */
 export const withServer = (
   handler: Deno.ServeHandler,
-  opts: Pick<Deno.ServeOptions, "port">,
+  opts: Pick<Deno.ServeTcpOptions, "port">,
   test: (url: string, t: Deno.TestContext) => void | Promise<void>,
 ) =>
 async (t: Deno.TestContext) => {

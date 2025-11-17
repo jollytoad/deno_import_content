@@ -32,7 +32,7 @@ async function getFileFetcher() {
  */
 export async function fetchFile(
   specifier: string,
-): Promise<string | Uint8Array> {
+): Promise<string | Uint8Array<ArrayBuffer>> {
   const fileFetcher = await getFileFetcher();
 
   if (isRelative(specifier)) {
@@ -45,7 +45,7 @@ export async function fetchFile(
   const response = await fileFetcher.fetch(resolved);
 
   if (response?.kind === "module") {
-    return response.content;
+    return response.content as (string | Uint8Array<ArrayBuffer>);
   } else {
     throw new TypeError(`Module content not found "${specifier.toString()}".`);
   }
